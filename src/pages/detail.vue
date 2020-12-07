@@ -1,84 +1,82 @@
 <template>
-  <a-list
-    class="demo-loadmore-list"
-    :loading="loading"
-    item-layout="horizontal"
-    :data-source="data"
-  >
-    <div
-      v-if="showLoadingMore"
-      slot="loadMore"
-      :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }"
-    >
-      <a-spin v-if="loadingMore" />
-      <a-button v-else @click="onLoadMore">
-        loading more
-      </a-button>
-    </div>
-    <a-list-item slot="renderItem" slot-scope="item">
-      <a slot="actions">edit</a>
-      <a slot="actions">more</a>
-      <a-list-item-meta
-        description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-      >
-        <a slot="title" href="https://www.antdv.com/">{{ item.name.last }}</a>
-        <a-avatar
-          slot="avatar"
-          src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-        />
-      </a-list-item-meta>
-      <div>content</div>
-    </a-list-item>
-  </a-list>
+  <div class="wrap">
+    <h3 :style="{ marginBottom: '16px' }">
+      Default Size
+    </h3>
+    <a-list bordered :data-source="data">
+      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+        {{ item }}
+      </a-list-item>
+      <div slot="header">
+        Header
+      </div>
+      <div slot="footer">
+        Footer
+      </div>
+    </a-list>
+    <h3 :style="{ margin: '16px 0' }">
+      Small Size
+    </h3>
+    <a-list size="small" bordered :data-source="data">
+      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+        {{ item }}
+      </a-list-item>
+      <div slot="header">
+        Header
+      </div>
+      <div slot="footer">
+        Footer
+      </div>
+    </a-list>
+    <h3 :style="{ margin: '16px 0' }">
+      Large Size
+    </h3>
+    <a-list size="large" bordered :data-source="data">
+      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+        {{ item }}
+      </a-list-item>
+      <div slot="header">
+        Header
+      </div>
+      <div slot="footer">
+        Footer
+      </div>
+    </a-list>
+  </div>
 </template>
+
 <script>
-
-// import reqwest from 'reqwest';
-// const fakeDataUrl = 'https://randomuser.me/api/?results=5&inc=name,gender,email,nat&noinfo';
-
+const data = [
+  'Racing car sprays burning fuel into crowd.',
+  'Japanese princess to wed commoner.',
+  'Australian walks 100km after outback crash.',
+  'Man charged over missing wedding girl.',
+  'Los Angeles battles huge wildfires.',
+];
 export default {
   data() {
     return {
-      loading: true,
-      loadingMore: false,
-      showLoadingMore: true,
-      data: [],
+      data,
     };
   },
   mounted() {
-    this.getData(res => {
-      this.loading = false;
-      this.data = res.results;
-    });
+    console.log(this.$route.query);
+    this.fetchList()
   },
   methods: {
-    // getData(callback) {
-    getData() {
-      // reqwest({
-      //   url: fakeDataUrl,
-      //   type: 'json',
-      //   method: 'get',
-      //   contentType: 'application/json',
-      //   success: res => {
-      //     callback(res);
-      //   },
-      // });
-    },
-    onLoadMore() {
-      // this.loadingMore = true;
-      // this.getData(res => {
-      //   this.data = this.data.concat(res.results);
-      //   this.loadingMore = false;
-      //   this.$nextTick(() => {
-      //     window.dispatchEvent(new Event('resize'));
-      //   });
-      // });
-    },
-  },
-};
+    fetchList() {
+      let path = `/magazine/article/catalog?&magazineguid=${this.$route.query.magazineguid}&year=${this.$route.query.year}&issue=${this.$route.query.issue}`;
+      this.axios.get(path).then((res) => {
+        this.list = res.Data;
+      });
+    }
+  }
+}
 </script>
+
 <style>
-.demo-loadmore-list {
-  min-height: 350px;
+.wrap {
+  background-color: white;
+  padding: 20px;
 }
 </style>

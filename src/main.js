@@ -23,9 +23,10 @@ axios.defaults.headers.common['ticket'] = 'lRkEO3GvpvjFd9hkdoLeemkBdGccnFT0yN-1i
 // axios.defaults.baseURL = env.baseURL;
 // 接口错误拦截
 axios.interceptors.response.use(function(response){
+  // console.log('response is ', response);
   let res = response.data;
   if(res.Code == 1){
-    return res.data;
+    return res;
   }else if(res.status == 0){
     // window.location.href = '/#/login';
     return Promise.reject(res);

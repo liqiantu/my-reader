@@ -5,16 +5,16 @@
       <a-menu
         theme="dark"
         mode="horizontal"
-        :default-selected-keys="['1']"
+        :default-selected-keys="['2']"
         :style="{ lineHeight: '64px' }"
       >
-        <a-menu-item key="1" @click="onMenuClick">
+        <a-menu-item key="2" @click="onMenuClick">
           期刊
         </a-menu-item>
-        <a-menu-item key="2">
+        <a-menu-item key="3" @click="onMenuClick">
           图书
         </a-menu-item>
-        <a-menu-item key="3">
+        <a-menu-item key="7" @click="onMenuClick">
           报纸
         </a-menu-item>
       </a-menu>
@@ -35,8 +35,11 @@
 <script>
 export default {
   methods: {
-    onMenuClick(item, key, keyPath) {
-      console.log(item, key, keyPath);
+    onMenuClick(item) {
+      if (item.item.isSelected) return;
+      console.log('key', item);
+      let url = `/index?kind=${item.key}`;
+      this.$router.push(url);
     }
   }
 }
