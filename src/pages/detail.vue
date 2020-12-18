@@ -1,82 +1,108 @@
 <template>
   <div class="wrap">
-    <h3 :style="{ marginBottom: '16px' }">
-      Default Size
-    </h3>
-    <a-list bordered :data-source="data">
-      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-        {{ item }}
-      </a-list-item>
-      <div slot="header">
-        Header
+    <div class="intro">
+      <img :src="issue.CoverImages[2]" alt="" />
+      <div class="right">
+        <div class="title">{{ issue.Name }}</div>
+        <div>{{ issue.Year }}年{{ issue.Issue }}期</div>
+        <div>{{ issue.Intro }}</div>
       </div>
-      <div slot="footer">
-        Footer
-      </div>
-    </a-list>
-    <h3 :style="{ margin: '16px 0' }">
-      Small Size
-    </h3>
-    <a-list size="small" bordered :data-source="data">
-      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-        {{ item }}
-      </a-list-item>
-      <div slot="header">
-        Header
-      </div>
-      <div slot="footer">
-        Footer
-      </div>
-    </a-list>
-    <h3 :style="{ margin: '16px 0' }">
-      Large Size
-    </h3>
-    <a-list size="large" bordered :data-source="data">
-      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-        {{ item }}
-      </a-list-item>
-      <div slot="header">
-        Header
-      </div>
-      <div slot="footer">
-        Footer
-      </div>
-    </a-list>
+    </div>
+
+    <div v-for="(item, index) in list" v-bind:key="index" class="list">
+      <a-list bordered :data-source="item.Articles">
+        <a-list-item slot="renderItem" slot-scope="i, index" :key="index" @click="onArticleClick(i)">
+          <div class="title">{{ i.Title }}</div>
+          <div v-if="i.Author" class="author">作者：{{ i.Author }}</div>
+        </a-list-item>
+        <div slot="header">
+          <h2>{{ item.Column }}</h2>
+        </div>
+        <!-- <div slot="footer">Footer</div> -->
+      </a-list>
+    </div>
   </div>
 </template>
 
 <script>
-const data = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.',
-];
 export default {
   data() {
     return {
-      data,
+      list: [],
+      issue: {},
     };
   },
   mounted() {
-    console.log(this.$route.query);
-    this.fetchList()
+    Promise.all([this.fetchIssue(), this.fetchList()])
+      .then((result) => {
+        this.issue = result[0];
+        this.list = result[1];
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
   methods: {
-    fetchList() {
-      let path = `/magazine/article/catalog?&magazineguid=${this.$route.query.magazineguid}&year=${this.$route.query.year}&issue=${this.$route.query.issue}`;
-      this.axios.get(path).then((res) => {
-        this.list = res.Data;
+    onArticleClick(i) {
+      console.log(i);
+      let url = `/content?articleid=${i.ArticleID}`
+      this.$router.push(url);
+    },
+    fetchIssue() {
+      let url = `/magazine/issue?id=${this.$route.query.magazineguid}&year=${this.$route.query.year}&issue=${this.$route.query.issue}`;
+      return new Promise((resolve, reject) => {
+        this.axios
+          .get(url)
+          .then((res) => {
+            resolve(res.Data);
+          })
+          .catch(function (error) {
+            reject(error);
+          });
       });
-    }
-  }
-}
+    },
+    fetchList() {
+      let url = `/magazine/article/catalog?&magazineguid=${this.$route.query.magazineguid}&year=${this.$route.query.year}&issue=${this.$route.query.issue}`;
+      return new Promise((resolve, reject) => {
+        this.axios
+          .get(url)
+          .then((res) => {
+            resolve(res.Data);
+          })
+          .catch(function (error) {
+            reject(error);
+          });
+      });
+    },
+  },
+};
 </script>
 
 <style>
 .wrap {
   background-color: white;
   padding: 20px;
+}
+
+.intro {
+  display: flex;
+  padding: 15px;
+}
+.intro .right {
+  margin-left: 25px;
+  width: 420px;
+}
+.right .title {
+  font-size: 18px;
+}
+
+.list {
+  margin-bottom: 24px;
+}
+.title {
+  font-size: 15px;
+}
+.author {
+  font-size: 12px;
 }
 </style>
